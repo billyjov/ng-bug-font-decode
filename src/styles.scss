@@ -1,0 +1,96 @@
+/* You can add global styles to this file, and also import other style files */
+/*-----------------------------------------*\
+  # ICONS: Use the material icon font base.
+\*-----------------------------------------*/
+
+$material-icons-codepoints: ();
+$material-icons-codepoints: map-merge(("adjust": e39e, "alarm": e855, "menu": e5d2, "keyboard_arrow_down": e313, "person": e7fd, "zoom_in": e8ff, "zoom_out": e900, ), $material-icons-codepoints);
+$material-icons-font-path: '../../fonts/' !default;
+$material-icons-font-path-regular: 'fonts/MaterialIcons-Regular.eot' !default;
+$material-icons-font-path-regular-woff: 'fonts/MaterialIcons-Regular.woff' !default;
+$material-icons-font-path-regular-woff2: 'fonts/MaterialIcons-Regular.woff2' !default;
+$material-icons-font-path-regular-ttf: 'fonts/MaterialIcons-Regular.ttf' !default;
+$material-icons-font-name: 'MaterialIcons-Regular' !default;
+$material-icons-font-size: 24px !default;
+$material-icons-font-family: 'Material Icons' !default;
+
+@mixin material-icons($font-size: $material-icons-font-size, $font-family: $material-icons-font-family) {
+  font-family: $font-family;
+  font-weight: normal;
+  font-style: normal;
+  font-size: $font-size;
+  display: inline-block;
+  line-height: 1;
+  text-transform: none;
+  letter-spacing: normal;
+  word-wrap: normal;
+  white-space: nowrap;
+  direction: ltr;
+  /* Support for all WebKit browsers. */
+  -webkit-font-smoothing: antialiased;
+  /* Support for Safari and Chrome. */
+  text-rendering: optimizeLegibility;
+  /* Support for Firefox. */
+  -moz-osx-font-smoothing: grayscale;
+  /* Support for IE. */
+  font-feature-settings: 'liga';
+}
+
+@function material-icons-content($codepoint) {
+  @return unquote('"\\#{$codepoint}"');
+}
+
+@mixin material-icon($name, $pseudo: 'before') {
+  $codepoint: map-get($material-icons-codepoints, $name);
+
+  &:#{$pseudo} {
+    content: material-icons-content($codepoint);
+  }
+}
+
+@font-face {
+  font-family: $material-icons-font-family;
+  font-style: normal;
+  font-weight: 400;
+  src: url('#{$material-icons-font-path-regular}');
+  /* For IE6-8 */
+  src: local($material-icons-font-family),
+  local($material-icons-font-name),
+  url('#{$material-icons-font-path-regular-woff2}') format('woff2'),
+  url('#{$material-icons-font-path-regular-woff}') format('woff'),
+  url('#{$material-icons-font-path-regular-ttf}') format('truetype');
+}
+
+.material-icons {
+  @include material-icons();
+}
+
+$material-icons-css-prefix: 'icon' !default;
+$material-icons-css-search: '_' !default;
+$material-icons-css-replace: '-' !default;
+
+@function material-icons-str-replace($string,
+  $search,
+  $replace: '') {
+  $index: str-index($string, $search);
+
+  @if $index {
+    @return str-slice($string,
+      1,
+      $index - 1)+$replace+material-icons-str-replace(str-slice($string,
+        $index+str-length($search)),
+      $search,
+      $replace);
+  }
+
+  @return $string;
+}
+
+@each $name,
+$codepoint in $material-icons-codepoints {
+  $class-name: material-icons-str-replace($name, $material-icons-css-search, $material-icons-css-replace);
+
+  .#{$material-icons-css-prefix}-#{$class-name} {
+    @include material-icon($name);
+  }
+}
